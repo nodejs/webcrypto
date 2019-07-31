@@ -1,17 +1,11 @@
 {
   "main": "./lib/index.js",
-  "type": "module",
   "devDependencies": {
-    "@babel/cli": "^7.5.5",
-    "@babel/core": "^7.5.5",
-    "@babel/node": "^7.5.5",
-    "@babel/preset-env": "^7.5.5",
-    "@babel/register": "^7.5.5",
     "eslint": "^6.1.0",
     "mocha": "^6.2.0"
   },
   "scripts": {
-    "test": "mocha --require @babel/register --recursive ./test/",
+    "test": "mocha --recursive ./test/",
     "lint": "eslint lib test"
   },
   "license": "MIT",

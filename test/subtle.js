@@ -1,6 +1,8 @@
-import assert from 'assert';
+'use strict';
 
-import { subtle } from '../';
+const assert = require('assert');
+
+const { subtle } = require('../');
 
 describe('crypto.subtle', () => {
   const fns = [
