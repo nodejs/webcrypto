@@ -1,6 +1,8 @@
-import assert from 'assert';
+'use strict';
 
-import { getRandomValues } from '../';
+const assert = require('assert');
+
+const { getRandomValues } = require('../');
 
 describe('crypto.getRandomBytes', () => {
   it('should exist', () => {

@@ -1,6 +1,8 @@
-import assert from 'assert';
+'use strict';
 
-import { subtle } from '../../lib';
+const assert = require('assert');
+
+const { subtle } = require('../../');
 
 describe('PBKDF2', () => {
   it('should import keys', async () => {

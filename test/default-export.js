@@ -1,6 +1,8 @@
-import assert from 'assert';
+'use strict';
 
-import crypto from '../';
+const assert = require('assert');
+
+const crypto = require('../');
 
 describe('Default export', () => {
   it('should have getRandomBytes', () => {
