@@ -31,7 +31,7 @@ function testGenImportExport(name) {
     assert(Buffer.isBuffer(expKey3));
     assert.strictEqual(expKey3.length, 32);
 
-    assert.notDeepEqual(expKey1, expKey2);
+    assert.notDeepStrictEqual(expKey1, expKey2);
 
     const impKey1 = await subtle.importKey('raw', expKey1, name, true,
                                            ['encrypt', 'decrypt']);
@@ -40,9 +40,9 @@ function testGenImportExport(name) {
     const impKey3 = await subtle.importKey('raw', expKey3, name, true,
                                            ['encrypt', 'decrypt']);
 
-    assert.deepEqual(await subtle.exportKey('raw', impKey1), expKey1);
-    assert.deepEqual(await subtle.exportKey('raw', impKey2), expKey2);
-    assert.deepEqual(await subtle.exportKey('raw', impKey3), expKey3);
+    assert.deepStrictEqual(await subtle.exportKey('raw', impKey1), expKey1);
+    assert.deepStrictEqual(await subtle.exportKey('raw', impKey2), expKey2);
+    assert.deepStrictEqual(await subtle.exportKey('raw', impKey3), expKey3);
   };
 }
 
@@ -64,15 +64,15 @@ describe('AES-CTR', () => {
       counter,
       length
     }, key, plaintext);
-    assert.deepEqual(ciphertext,
-                     Buffer.from('0bdbe0f2de637f43b9d86f8bb0ba5f05', 'hex'));
+    assert.strictEqual(ciphertext.toString('hex'),
+                       '0bdbe0f2de637f43b9d86f8bb0ba5f05');
 
     const deciphered = await subtle.decrypt({
       name: 'AES-CTR',
       counter,
       length
     }, key, ciphertext);
-    assert.deepEqual(deciphered, plaintext);
+    assert.deepStrictEqual(deciphered, plaintext);
   });
 
   it('should handle the "length" parameter', async () => {
@@ -90,11 +90,11 @@ describe('AES-CTR', () => {
     assert.strictEqual(ciphertext.length, 4 * blockSize);
     const encryptedFirstHalf = ciphertext.slice(0, 2 * blockSize);
     const encryptedSecondHalf = ciphertext.slice(2 * blockSize);
-    assert.deepEqual(encryptedFirstHalf, encryptedSecondHalf);
+    assert.deepStrictEqual(encryptedFirstHalf, encryptedSecondHalf);
 
     let decrypted = await subtle.decrypt({ name: 'AES-CTR', counter, length },
                                          key, ciphertext);
-    assert.deepEqual(decrypted, plaintext);
+    assert.deepStrictEqual(decrypted, plaintext);
 
     // This is slightly more tricky: We allow incrementing the last 127 bits,
     // which will not lead to any repetitions that we could test for. However,
@@ -112,12 +112,12 @@ describe('AES-CTR', () => {
       counter: expectedIV,
       length: 128
     }, key, plaintext.slice(blockSize, 2 * blockSize));
-    assert.deepEqual(ciphertext.slice(blockSize, 2 * blockSize),
-                     expectedSecondBlock);
+    assert.deepStrictEqual(ciphertext.slice(blockSize, 2 * blockSize),
+                           expectedSecondBlock);
 
     decrypted = await subtle.decrypt({ name: 'AES-CTR', counter, length }, key,
                                      ciphertext);
-    assert.deepEqual(decrypted, plaintext);
+    assert.deepStrictEqual(decrypted, plaintext);
   });
 });
 
@@ -137,15 +137,15 @@ describe('AES-CBC', () => {
       name: 'AES-CBC',
       iv
     }, key, plaintext);
-    assert.deepEqual(ciphertext,
-                     Buffer.from('8bb6173879b0f7a8899397e0fde3a3c88c69e86b18' +
-                                 'eb74f8629be60287c89552', 'hex'));
+    assert.strictEqual(ciphertext.toString('hex'),
+                       '8bb6173879b0f7a8899397e0fde3a3c88c69e86b18' +
+                       'eb74f8629be60287c89552');
 
     const deciphered = await subtle.decrypt({
       name: 'AES-CBC',
       iv
     }, key, ciphertext);
-    assert.deepEqual(deciphered, plaintext);
+    assert.deepStrictEqual(deciphered, plaintext);
   });
 });
 
@@ -165,15 +165,15 @@ describe('AES-GCM', () => {
       name: 'AES-GCM',
       iv
     }, key, plaintext);
-    assert.deepEqual(ciphertext,
-                     Buffer.from('7080337fe4a1f8d8d96fa061ccfdb8cda6dacbf3f2' +
-                                 '7ef1dc85190feddc4befdd', 'hex'));
+    assert.strictEqual(ciphertext.toString('hex'),
+                       '7080337fe4a1f8d8d96fa061ccfdb8cda6dacbf3f2' +
+                       '7ef1dc85190feddc4befdd');
 
     const deciphered = await subtle.decrypt({
       name: 'AES-GCM',
       iv
     }, key, ciphertext);
-    assert.deepEqual(deciphered, plaintext);
+    assert.deepStrictEqual(deciphered, plaintext);
   });
 
   it('should handle the "tagLength" parameter', async () => {
@@ -189,16 +189,16 @@ describe('AES-GCM', () => {
       iv,
       tagLength: 112
     }, key, plaintext);
-    assert.deepEqual(ciphertext,
-                     Buffer.from('7080337fe4a1f8d8d96fa061ccfdb8cda6dacbf3f2' +
-                                 '7ef1dc85190feddc4b', 'hex'));
+    assert.strictEqual(ciphertext.toString('hex'),
+                       '7080337fe4a1f8d8d96fa061ccfdb8cda6dacbf3f2' +
+                       '7ef1dc85190feddc4b');
 
     const deciphered = await subtle.decrypt({
       name: 'AES-GCM',
       iv,
       tagLength: 112
     }, key, ciphertext);
-    assert.deepEqual(deciphered, plaintext);
+    assert.deepStrictEqual(deciphered, plaintext);
   });
 
   it('should support all IV lengths', async () => {
@@ -214,16 +214,16 @@ describe('AES-GCM', () => {
       iv,
       tagLength: 112
     }, key, plaintext);
-    assert.deepEqual(ciphertext,
-                     Buffer.from('2f136ce56f36acf081476d227c0fb89ed4e0fcd07b' +
-                                 '3b8de9d412f99a2c2d', 'hex'));
+    assert.strictEqual(ciphertext.toString('hex'),
+                       '2f136ce56f36acf081476d227c0fb89ed4e0fcd07b' +
+                       '3b8de9d412f99a2c2d');
 
     const deciphered = await subtle.decrypt({
       name: 'AES-GCM',
       iv,
       tagLength: 112
     }, key, ciphertext);
-    assert.deepEqual(deciphered, plaintext);
+    assert.deepStrictEqual(deciphered, plaintext);
   });
 });
 
@@ -248,7 +248,7 @@ describe('AES-KW', () => {
     const unwrappedKey = await subtle.unwrapKey('raw', wrappedKey, wrappingKey,
                                                 'AES-KW', 'AES-CBC', true,
                                                 ['encrypt', 'decrypt']);
-    assert.deepEqual(await subtle.exportKey('raw', unwrappedKey),
-                     await subtle.exportKey('raw', keyToWrap));
+    assert.deepStrictEqual(await subtle.exportKey('raw', unwrappedKey),
+                           await subtle.exportKey('raw', keyToWrap));
   });
 });

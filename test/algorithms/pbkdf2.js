@@ -12,7 +12,7 @@ describe('PBKDF2', () => {
     assert.strictEqual(key.algorithm.name, 'PBKDF2');
     assert.strictEqual(key.type, 'secret');
     assert.strictEqual(key.extractable, false);
-    assert.deepEqual(key.usages, ['deriveBits']);
+    assert.deepStrictEqual(key.usages, ['deriveBits']);
   });
 
   it('should produce correct outputs', async () => {
