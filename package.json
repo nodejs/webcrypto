@@ -1,19 +1,20 @@
 {
   "main": "./lib/index.js",
   "devDependencies": {
+    "babel-eslint": "^10.0.2",
     "eslint": "^6.1.0",
     "mocha": "^6.2.0"
   },
   "scripts": {
     "test": "mocha --recursive ./test/",
-    "lint": "eslint lib test"
+    "lint": "eslint ."
   },
   "license": "MIT",
   "private": true,
   "author": "Tobias Nießen <tniessen@tnie.de>",
   "bugs": "https://github.com/nodejs/webcrypto/issues",
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/nodejs/webcrypto.git"
+    "type": "git",
+    "url": "https://github.com/nodejs/webcrypto.git"
   }
 }

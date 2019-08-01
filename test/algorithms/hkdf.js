@@ -12,7 +12,7 @@ describe('HKDF', () => {
     assert.strictEqual(key.algorithm.name, 'HKDF');
     assert.strictEqual(key.type, 'secret');
     assert.strictEqual(key.extractable, false);
-    assert.deepEqual(key.usages, ['deriveBits']);
+    assert.deepStrictEqual(key.usages, ['deriveBits']);
   });
 
   it('should produce correct outputs', async () => {
@@ -28,8 +28,8 @@ describe('HKDF', () => {
     }, key, 128);
 
     assert(Buffer.isBuffer(bits));
-    assert.strictEqual(bits.toString('hex'),
-                       '4b52236af0e6516384e531e618c95b96');
+    assert.deepStrictEqual(bits.toString('hex'),
+                           '4b52236af0e6516384e531e618c95b96');
   });
 
   it('should produce correct keys', async () => {
