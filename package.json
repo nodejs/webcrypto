@@ -3,10 +3,12 @@
   "devDependencies": {
     "babel-eslint": "^10.0.2",
     "eslint": "^6.1.0",
-    "mocha": "^6.2.0"
+    "mocha": "^6.2.0",
+    "nyc": "^14.1.1"
   },
   "scripts": {
     "test": "mocha --recursive ./test/",
+    "coverage": "nyc --reporter=html --reporter=text mocha --recursive ./test/",
     "lint": "eslint ."
   },
   "license": "MIT",
