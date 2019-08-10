@@ -14,16 +14,13 @@ streaming interfaces. WebCrypto has no streaming interfaces but only one-shot
 APIs. Encrypting, hashing, signing or verifying large amounts of data is thus
 difficult in WebCrypto without underlying asynchronous APIs.
 
-This is not considered to be a deficiency of Node.js, but rather an unfortunate
-design conflict. More efficient alternatives will be explored at a later point.
-
 ## Development
 
 ### Structure
 
 The main export of this package is implemented in `lib/index.js` and represents
-the `Crypto` interface as defined in section 10 of the WebCrypto specification.
-It contains two members:
+the `Crypto` interface as defined in section 10 of the
+[WebCrypto specification][]. It contains two members:
 
 - The `subtle` attribute is implemented in `lib/subtle.js`, including all
   methods described in section 14.3 of the WebCrypto specification. These
@@ -43,3 +40,5 @@ broken by a later commit.
 ### Linting
 
 This repository uses ESLint. Use `npm run lint` to check the code.
+
+[WebCrypto specification]: https://www.w3.org/TR/WebCryptoAPI/
