@@ -32,6 +32,31 @@ describe('HMAC', () => {
     }
   });
 
+  it('should support JWK import and export', async () => {
+    const jwk = {
+      alg: 'HS256',
+      ext: true,
+      k: 'To82qfc2c2StSSIQ1FosEGlGHMQ-qsLMJwbpVck6fvE',
+      key_ops: ['sign', 'verify'],
+      kty: 'oct'
+    };
+
+    const algorithm = {
+      name: 'HMAC',
+      hash: 'SHA-256'
+    };
+
+    const key = await subtle.importKey('jwk', jwk, algorithm, true,
+                                       ['sign', 'verify']);
+    assert.strictEqual(key.algorithm.name, 'HMAC');
+    assert.strictEqual(key.algorithm.length, 256);
+
+    assert.strictEqual((await subtle.exportKey('raw', key)).toString('hex'),
+                       '4e8f36a9f7367364ad492210d45a2c1069461cc43eaac2cc2706e' +
+                       '955c93a7ef1');
+    assert.deepStrictEqual(await subtle.exportKey('jwk', key), jwk);
+  });
+
   it('should sign and verify data', async () => {
     const key = await subtle.generateKey({
       name: 'HMAC',
