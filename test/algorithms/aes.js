@@ -9,16 +9,16 @@ function twice(buf) {
   return Buffer.concat([buf, buf], buf.length * 2);
 }
 
-function testGenImportExport(name) {
+function testGenImportExport(name, keyUsages) {
   return async () => {
     const key1 = await subtle.generateKey({ name, length: 192 }, true,
-                                          ['encrypt', 'decrypt']);
+                                          keyUsages);
     assert.strictEqual(key1.algorithm.name, name);
     const key2 = await subtle.generateKey({ name, length: 192 }, true,
-                                          ['encrypt', 'decrypt']);
+                                          keyUsages);
     assert.strictEqual(key2.algorithm.name, name);
     const key3 = await subtle.generateKey({ name, length: 256 }, true,
-                                          ['encrypt', 'decrypt']);
+                                          keyUsages);
     assert.strictEqual(key3.algorithm.name, name);
 
     const expKey1 = await subtle.exportKey('raw', key1);
@@ -34,11 +34,11 @@ function testGenImportExport(name) {
     assert.notDeepStrictEqual(expKey1, expKey2);
 
     const impKey1 = await subtle.importKey('raw', expKey1, name, true,
-                                           ['encrypt', 'decrypt']);
+                                           keyUsages);
     const impKey2 = await subtle.importKey('raw', expKey2, name, true,
-                                           ['encrypt', 'decrypt']);
+                                           keyUsages);
     const impKey3 = await subtle.importKey('raw', expKey3, name, true,
-                                           ['encrypt', 'decrypt']);
+                                           keyUsages);
 
     assert.deepStrictEqual(await subtle.exportKey('raw', impKey1), expKey1);
     assert.deepStrictEqual(await subtle.exportKey('raw', impKey2), expKey2);
@@ -46,10 +46,10 @@ function testGenImportExport(name) {
   };
 }
 
-function testJsonWebKeys(algorithmName, jwkAlgorithmSuffix) {
+function testJsonWebKeys(algorithmName, jwkAlgorithmSuffix, keyUsages) {
   async function test(jwk, hexKey, length) {
     const key = await subtle.importKey('jwk', jwk, algorithmName, true,
-                                       ['encrypt', 'decrypt']);
+                                       keyUsages);
     assert.strictEqual(key.algorithm.name, algorithmName);
     assert.strictEqual(key.algorithm.length, length);
 
@@ -66,7 +66,7 @@ function testJsonWebKeys(algorithmName, jwkAlgorithmSuffix) {
         alg: `A128${jwkAlgorithmSuffix}`,
         k: 'GawgguFyGrWKav7AX4VKUg',
         ext: true,
-        key_ops: ['encrypt', 'decrypt']
+        key_ops: keyUsages
       }, '19ac2082e1721ab58a6afec05f854a52', 128),
 
       // Generated in Mozilla Firefox.
@@ -74,7 +74,7 @@ function testJsonWebKeys(algorithmName, jwkAlgorithmSuffix) {
         alg: `A192${jwkAlgorithmSuffix}`,
         ext: true,
         k: 'bOHt12k8byt-XKHo9kXY_1skBP10eJGC',
-        key_ops: ['encrypt', 'decrypt'],
+        key_ops: keyUsages,
         kty: 'oct'
       }, '6ce1edd7693c6f2b7e5ca1e8f645d8ff5b2404fd74789182', 192)
     ]);
@@ -83,10 +83,10 @@ function testJsonWebKeys(algorithmName, jwkAlgorithmSuffix) {
 
 describe('AES-CTR', () => {
   it('should generate, import and export keys',
-     testGenImportExport('AES-CTR'));
+     testGenImportExport('AES-CTR', ['encrypt', 'decrypt']));
 
   it('should support JWK import and export',
-     testJsonWebKeys('AES-CTR', 'CTR'));
+     testJsonWebKeys('AES-CTR', 'CTR', ['encrypt', 'decrypt']));
 
   it('should encrypt and decrypt', async () => {
     const keyData = Buffer.from('36adfe538cc234279e4cbb29e1f27af5', 'hex');
@@ -161,10 +161,10 @@ describe('AES-CTR', () => {
 
 describe('AES-CBC', () => {
   it('should generate, import and export keys',
-     testGenImportExport('AES-CBC'));
+     testGenImportExport('AES-CBC', ['encrypt', 'decrypt']));
 
   it('should support JWK import and export',
-     testJsonWebKeys('AES-CBC', 'CBC'));
+     testJsonWebKeys('AES-CBC', 'CBC', ['encrypt', 'decrypt']));
 
   it('should encrypt and decrypt', async () => {
     const keyData = Buffer.from('36adfe538cc234279e4cbb29e1f27af5', 'hex');
@@ -192,10 +192,10 @@ describe('AES-CBC', () => {
 
 describe('AES-GCM', () => {
   it('should generate, import and export keys',
-     testGenImportExport('AES-GCM'));
+     testGenImportExport('AES-GCM', ['encrypt', 'decrypt']));
 
   it('should support JWK import and export',
-     testJsonWebKeys('AES-GCM', 'GCM'));
+     testJsonWebKeys('AES-GCM', 'GCM', ['encrypt', 'decrypt']));
 
   it('should encrypt and decrypt', async () => {
     const keyData = Buffer.from('36adfe538cc234279e4cbb29e1f27af5', 'hex');
@@ -273,10 +273,10 @@ describe('AES-GCM', () => {
 
 describe('AES-KW', () => {
   it('should generate, import and export keys',
-     testGenImportExport('AES-KW'));
+     testGenImportExport('AES-KW', ['wrapKey', 'unwrapKey']));
 
   it('should support JWK import and export',
-     testJsonWebKeys('AES-KW', 'KW'));
+     testJsonWebKeys('AES-KW', 'KW', ['wrapKey', 'unwrapKey']));
 
   it('should wrap and unwrap keys', async () => {
     const wrappingKey = await subtle.generateKey({
