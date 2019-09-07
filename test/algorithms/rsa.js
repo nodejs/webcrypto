@@ -8,14 +8,14 @@ const { subtle } = require('../../');
 // Disables timeouts for tests that involve key pair generation.
 const NO_TIMEOUT = 0;
 
-function testGenImportExport(name) {
+function testGenImportExport(name, pubKeyUsage, privKeyUsage) {
   return async () => {
     const { publicKey, privateKey } = await subtle.generateKey({
       name,
       modulusLength: 2048,
       publicExponent: new Uint8Array([0x00, 0x00, 0x00, 0x01, 0x00, 0x01]),
       hash: 'SHA-384'
-    }, true, ['sign', 'verify']);
+    }, true, [pubKeyUsage, privKeyUsage]);
 
     assert.strictEqual(publicKey.type, 'public');
     assert.strictEqual(privateKey.type, 'private');
@@ -35,11 +35,11 @@ function testGenImportExport(name) {
     const impPublicKey = await subtle.importKey('spki', expPublicKey, {
       name,
       hash: 'SHA-384'
-    }, true, ['verify']);
+    }, true, [pubKeyUsage]);
     const impPrivateKey = await subtle.importKey('pkcs8', expPrivateKey, {
       name,
       hash: 'SHA-384'
-    }, true, ['sign']);
+    }, true, [privKeyUsage]);
 
     assert.deepStrictEqual(await subtle.exportKey('spki', impPublicKey),
                            expPublicKey);
@@ -50,7 +50,7 @@ function testGenImportExport(name) {
 
 describe('RSASSA-PKCS1-v1_5', () => {
   it('should generate, import and export keys',
-     testGenImportExport('RSASSA-PKCS1-v1_5'))
+     testGenImportExport('RSASSA-PKCS1-v1_5', 'verify', 'sign'))
   .timeout(NO_TIMEOUT);
 
   it('should sign and verify data', async () => {
@@ -111,7 +111,7 @@ describe('RSASSA-PKCS1-v1_5', () => {
 
 describe('RSA-PSS', () => {
   it('should generate, import and export keys',
-     testGenImportExport('RSA-PSS'))
+     testGenImportExport('RSA-PSS', 'verify', 'sign'))
   .timeout(NO_TIMEOUT);
 
   it('should sign and verify data', async () => {
@@ -170,5 +170,82 @@ describe('RSA-PSS', () => {
     const signature = Buffer.from(signatureData, 'hex');
     const ok = await subtle.verify('RSA-PSS', publicKey, signature, data);
     assert.strictEqual(ok, true);
+  });
+});
+
+describe('RSA-OAEP', () => {
+  it('should generate, import and export keys',
+     testGenImportExport('RSA-OAEP', 'encrypt', 'decrypt'))
+  .timeout(NO_TIMEOUT);
+
+  it('should encrypt and decrypt data', async () => {
+    const hashes = [
+      ['SHA-1', 20],
+      ['SHA-256', 32],
+      ['SHA-384', 48],
+      ['SHA-512', 64]
+    ];
+
+    const modulusLength = 2048;
+    const publicExponent = Buffer.from([0x01, 0x00, 0x01]);
+
+    for (const [hash, hLen] of hashes) {
+      const { privateKey, publicKey } = await subtle.generateKey({
+        name: 'RSA-OAEP',
+        publicExponent,
+        modulusLength,
+        hash
+      }, false, ['encrypt', 'decrypt']);
+
+      const maxMessageLength = (modulusLength >> 3) - 2 * (hLen + 1);
+      const data = randomBytes(maxMessageLength);
+      const encrypted = await subtle.encrypt('RSA-OAEP', publicKey, data);
+      const decrypted = await subtle.decrypt('RSA-OAEP', privateKey, encrypted);
+      assert.deepStrictEqual(decrypted, data);
+    }
+  })
+  .timeout(NO_TIMEOUT);
+
+  it('should decrypt externally encrypted data', async () => {
+    const privKeyData = '30820276020100300d06092a864886f70d010101050004820260' +
+                        '3082025c02010002818100df01caee5ec9a2811541d7b1d69b09' +
+                        'b5cd2fcda3bc7ee36aec73c90f76c5e2ecacdfe4fad1c9c51390' +
+                        '63d4e8b09182e3a17ff97630fcace335932d7686474ea6153dd5' +
+                        'a8da0fbb868f9a9142974e0f815563f1875cb21d80275b014a9d' +
+                        'ec34afa74980cb308565a982b79dcf0b74444a9633ff696f77b4' +
+                        '2be335bd625816d071020301000102818018aded5c136bdb9ace' +
+                        'f42e2f6d69537a05e6e22a5a682d794e0923495d92d941e980ce' +
+                        'a9ae5156c8cb3c2d1a023e5c3e9e47181fab1caf7266a1aed094' +
+                        'dc2bd91302d09ea329373ce8d13c6661ef473c5fe5a9918dd2d6' +
+                        '53e469ae9111a8a4c43dd9a15792aa75c3a39aefead2f9b3f2cc' +
+                        '34aa47ed86c1d86e1861447ee80015024100fac8b778a8bbaf3c' +
+                        'b3fa0c4185bb31a664504b0aa792db9a5898c4568b737a82f062' +
+                        '7a2033db6ae5e47d5d6aa46677851e6f5afbca98923b1ab780ac' +
+                        '8e28a655024100e3a52dcf102e4aeb2539917c7d83d2f834fee1' +
+                        '1952ebc57e89b4da3a505ffc9948a5e9fda4b1a8bb029e43c0fb' +
+                        '3f49f5f82077c1b827a558324faf703d23c5ad024038113fd39e' +
+                        '05b7fbde50fd04791d8cd022854101b4cd448391633622133352' +
+                        '248c11b83412e3ef564e6b28c37ad5ddcac92f242c3ef3355e39' +
+                        '6ee539aedeafb1024017707e92ff7b84c34985eff0fd8b814185' +
+                        '5369220e63b066230fb818a106012057569e0d3bd3ff27a25161' +
+                        '70916e26d368c50f0fa7428dc7d306596e191d81d1024100800c' +
+                        '17d7bb714465d1098528d4da6175960e962e816bbd88cc074d04' +
+                        '3aae179a9993e6374c0dab3b880b1a6bd539bfe6e5e23af83671' +
+                        '791658cd347771a95ba8';
+    const privateKeyBuffer = Buffer.from(privKeyData, 'hex');
+    const privateKey = await subtle.importKey('pkcs8', privateKeyBuffer, {
+      name: 'RSA-OAEP',
+      hash: 'SHA-256'
+    }, false, ['decrypt']);
+
+    const plaintext = Buffer.from('0a0b0c0d0e0f', 'hex');
+    const ciphertext = '82fc649917a95667df2335375e053edc79a48b8a4d2126dc1efa7' +
+                       '703c107eacffa6826ce6eb439e680b2bde0f9a405fe259093425a' +
+                       'cd153629564c95801c4cd701c4b9332b0e9a0ac0d5c5d1af24a3a' +
+                       'a481e511f3f1fc6e469a3edf60af2632ad1380dd2000d896b8bb8' +
+                       '088ed49debaa6b5a8d7365b9556c8ac31d5401d2e1c4';
+    const decrypted = await subtle.decrypt('RSA-OAEP', privateKey,
+                                           Buffer.from(ciphertext, 'hex'));
+    assert.deepStrictEqual(decrypted, plaintext);
   });
 });
