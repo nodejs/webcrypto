@@ -185,6 +185,11 @@ describe('RSA-OAEP', () => {
       ['SHA-384', 48],
       ['SHA-512', 64]
     ];
+    const encryptionParams = [
+      'RSA-OAEP',
+      { name: 'RSA-OAEP', label: Buffer.from([]) },
+      { name: 'RSA-OAEP', label: randomBytes(20) }
+    ];
 
     const modulusLength = 2048;
     const publicExponent = Buffer.from([0x01, 0x00, 0x01]);
@@ -199,9 +204,11 @@ describe('RSA-OAEP', () => {
 
       const maxMessageLength = (modulusLength >> 3) - 2 * (hLen + 1);
       const data = randomBytes(maxMessageLength);
-      const encrypted = await subtle.encrypt('RSA-OAEP', publicKey, data);
-      const decrypted = await subtle.decrypt('RSA-OAEP', privateKey, encrypted);
-      assert.deepStrictEqual(decrypted, data);
+      for (const params of encryptionParams) {
+        const encrypted = await subtle.encrypt(params, publicKey, data);
+        const decrypted = await subtle.decrypt(params, privateKey, encrypted);
+        assert.deepStrictEqual(decrypted, data);
+      }
     }
   })
   .timeout(NO_TIMEOUT);
@@ -239,13 +246,24 @@ describe('RSA-OAEP', () => {
     }, false, ['decrypt']);
 
     const plaintext = Buffer.from('0a0b0c0d0e0f', 'hex');
-    const ciphertext = '82fc649917a95667df2335375e053edc79a48b8a4d2126dc1efa7' +
-                       '703c107eacffa6826ce6eb439e680b2bde0f9a405fe259093425a' +
-                       'cd153629564c95801c4cd701c4b9332b0e9a0ac0d5c5d1af24a3a' +
-                       'a481e511f3f1fc6e469a3edf60af2632ad1380dd2000d896b8bb8' +
-                       '088ed49debaa6b5a8d7365b9556c8ac31d5401d2e1c4';
-    const decrypted = await subtle.decrypt('RSA-OAEP', privateKey,
-                                           Buffer.from(ciphertext, 'hex'));
+    let ciphertext = '82fc649917a95667df2335375e053edc79a48b8a4d2126dc1efa7' +
+                     '703c107eacffa6826ce6eb439e680b2bde0f9a405fe259093425a' +
+                     'cd153629564c95801c4cd701c4b9332b0e9a0ac0d5c5d1af24a3a' +
+                     'a481e511f3f1fc6e469a3edf60af2632ad1380dd2000d896b8bb8' +
+                     '088ed49debaa6b5a8d7365b9556c8ac31d5401d2e1c4';
+    let decrypted = await subtle.decrypt('RSA-OAEP', privateKey,
+                                         Buffer.from(ciphertext, 'hex'));
+    assert.deepStrictEqual(decrypted, plaintext);
+
+    ciphertext = '13a083e3ce3c705d365b39e58b76d1ff8dcca8e06c18ef88e66ca9b53fd' +
+                 'e3f138371c3ee685c27ce5445be1cb93d08f581db150c01a1d4d34c20c4' +
+                 'e6e02bcbe65e046afef622a90de07412b62e1bf07ea5f33658e6e91e28d' +
+                 '4eb2bd02bacdcbd6216d50951e972f90818f511707a53b9a8d6eee322bf' +
+                 'ff17503592d61dec320e';
+    decrypted = await subtle.decrypt({
+      name: 'RSA-OAEP',
+      label: Buffer.from('WebCrypto', 'ascii')
+    }, privateKey, Buffer.from(ciphertext, 'hex'));
     assert.deepStrictEqual(decrypted, plaintext);
   });
 });

@@ -20,6 +20,6 @@
     "url": "https://github.com/nodejs/webcrypto.git"
   },
   "engines": {
-    "node": "^12.x"
+    "node": ">= 12.11"
   }
 }
