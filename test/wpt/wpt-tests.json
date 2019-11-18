@@ -1,0 +1,87 @@
+[
+  {
+    "name": "getRandomValues",
+    "files": ["getRandomValues.any.js"]
+  },
+  {
+    "name": "derive_bits_keys/ecdh_bits",
+    "files": ["derive_bits_keys/ecdh_bits.js", "derive_bits_keys/ecdh_bits.https.any.js"]
+  },
+  {
+    "name": "derive_bits_keys/ecdh_keys",
+    "files": ["derive_bits_keys/ecdh_keys.js", "derive_bits_keys/ecdh_keys.https.any.js"]
+  },
+  {
+    "name": "derive_bits_keys/hkdf",
+    "files": ["derive_bits_keys/hkdf_vectors.js", "derive_bits_keys/hkdf.js", "derive_bits_keys/hkdf.https.any.js"]
+  },
+  {
+    "name": "derive_bits_keys/pbkdf2",
+    "files": ["derive_bits_keys/pbkdf2_vectors.js", "derive_bits_keys/pbkdf2.js", "derive_bits_keys/pbkdf2.https.any.js"]
+  },
+  {
+    "name": "digest/digest",
+    "files": ["digest/digest.js"],
+    "code": "run_test()",
+    "explicitDone": true
+  },
+  {
+    "name": "encrypt_decrypt/aes_cbc",
+    "files": ["encrypt_decrypt/aes_cbc_vectors.js", "encrypt_decrypt/aes.js"],
+    "code": "run_test()",
+    "explicitDone": true
+  },
+  {
+    "name": "encrypt_decrypt/aes_ctr",
+    "files": ["encrypt_decrypt/aes_ctr_vectors.js", "encrypt_decrypt/aes.js"],
+    "code": "run_test()",
+    "explicitDone": true
+  },
+  {
+    "name": "encrypt_decrypt/aes_gcm",
+    "files": ["encrypt_decrypt/aes_gcm_vectors.js", "encrypt_decrypt/aes.js"],
+    "code": "run_test()",
+    "explicitDone": true
+  },
+  {
+    "name": "encrypt_decrypt/rsa",
+    "files": ["encrypt_decrypt/rsa_vectors.js", "encrypt_decrypt/rsa.js"],
+    "code": "run_test()",
+    "explicitDone": true
+  },
+  {
+    "name": "import_export/ec_importKey",
+    "files": ["import_export/ec_importKey.js"],
+    "code": "run_test()"
+  },
+  {
+    "name": "import_export/rsa_importKey",
+    "files": ["import_export/rsa_importKey.js"],
+    "code": "run_test()"
+  },
+  {
+    "name": "import_export/symmetric_importKey",
+    "files": ["import_export/symmetric_importKey.js"],
+    "code": "run_test()"
+  },
+  {
+    "name": "sign_verify/ecdsa",
+    "files": ["sign_verify/ecdsa_vectors.js", "sign_verify/ecdsa.js"],
+    "code": "run_test()"
+  },
+  {
+    "name": "sign_verify/hmac",
+    "files": ["sign_verify/hmac_vectors.js", "sign_verify/hmac.js"],
+    "code": "run_test()"
+  },
+  {
+    "name": "sign_verify/rsa_pkcs",
+    "files": ["sign_verify/rsa_pkcs_vectors.js", "sign_verify/rsa.js"],
+    "code": "run_test()"
+  },
+  {
+    "name": "sign_verify/rsa_pss",
+    "files": ["sign_verify/rsa_pss_vectors.js", "sign_verify/rsa.js"],
+    "code": "run_test()"
+  }
+]
