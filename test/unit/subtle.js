@@ -2,7 +2,7 @@
 
 const assert = require('assert');
 
-const { subtle } = require('../');
+const { subtle } = require('../../lib');
 
 describe('crypto.subtle', () => {
   const fns = [

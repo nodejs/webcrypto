@@ -2,7 +2,7 @@
 
 const assert = require('assert');
 
-const crypto = require('../');
+const crypto = require('../../lib');
 
 describe('Default export', () => {
   it('should have getRandomBytes', () => {
