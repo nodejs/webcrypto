@@ -7,9 +7,9 @@
     "nyc": "^14.1.1"
   },
   "scripts": {
-    "test": "mocha --recursive ./test/",
-    "coverage": "nyc --reporter=html --reporter=text mocha --recursive ./test/",
-    "lint": "eslint ."
+    "test": "mocha --recursive ./test/unit/",
+    "coverage": "nyc --reporter=html --reporter=text mocha --recursive ./test/unit/",
+    "lint": "eslint lib test/unit"
   },
   "license": "MIT",
   "private": true,

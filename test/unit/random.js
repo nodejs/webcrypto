@@ -2,7 +2,7 @@
 
 const assert = require('assert');
 
-const { getRandomValues } = require('../');
+const { getRandomValues } = require('../../lib');
 
 describe('crypto.getRandomBytes', () => {
   it('should exist', () => {

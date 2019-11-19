@@ -2,7 +2,7 @@
 
 const assert = require('assert');
 
-const { subtle } = require('../../');
+const { subtle } = require('../../../');
 
 describe('PBKDF2', () => {
   it('should import keys', async () => {
