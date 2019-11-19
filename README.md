@@ -33,9 +33,12 @@ the `Crypto` interface as defined in section 10 of the
 The `test` directory contains a small number of unit tests. All of these tests
 are required to pass after each commit. You can run unit tests using `npm test`.
 
-It is our intention to add Web Platform Tests (WPT) at some point. When this
-happens, not all WPTs are required to pass, but if a test passes, it must not be
-broken by a later commit.
+A coverage report can be generated using the command `npm run coverage`.
+
+A subset of web-platform-tests can also be used for testing. The `test/wpt/wpt`
+submodule must be initialized in order to use them. You can run the WPTs
+using `npm run wpt`. Proposed changes do not need to pass all WPTs, but they
+should not break tests that passed without the changes.
 
 ### Linting
 
