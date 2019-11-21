@@ -118,7 +118,17 @@ async function runTest(test) {
     },
     btoa(data) {
       return Buffer.from(data, 'binary').toString('base64');
-    }
+    },
+
+    Int8Array,
+    Uint8Array,
+    Int16Array,
+    Uint16Array,
+    Int32Array,
+    Uint32Array,
+    Uint8ClampedArray,
+    Float32Array,
+    Float64Array
   };
 
   sandbox.self = sandbox;
