@@ -5,7 +5,7 @@ const path = require('path');
 const fs = require('fs');
 const vm = require('vm');
 
-const crypto = require('../../');
+const { crypto, CryptoKey } = require('../../');
 
 const tests = require('./wpt-tests');
 
@@ -39,6 +39,7 @@ async function runTest(test) {
   // Environment for tests.
   const sandbox = {
     crypto,
+    CryptoKey,
     setup(options) {
       if (arguments.length !== 1 || typeof options !== 'object')
         bug('setup() got invalid arguments:', arguments);

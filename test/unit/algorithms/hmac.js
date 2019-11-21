@@ -3,7 +3,7 @@
 const assert = require('assert');
 const { randomBytes } = require('crypto');
 
-const { subtle } = require('../../../');
+const { crypto: { subtle } } = require('../../../');
 
 describe('HMAC', () => {
   it('should generate, import and export keys', async () => {

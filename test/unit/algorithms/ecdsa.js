@@ -3,7 +3,7 @@
 const assert = require('assert');
 const { randomBytes } = require('crypto');
 
-const { subtle } = require('../../../');
+const { crypto: { subtle } } = require('../../../');
 
 // Disables timeouts for tests that involve key pair generation.
 const NO_TIMEOUT = 0;

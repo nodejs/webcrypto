@@ -2,7 +2,7 @@
 
 const assert = require('assert');
 
-const { subtle } = require('../../../');
+const { crypto: { subtle } } = require('../../../');
 
 describe('SHA', () => {
 
