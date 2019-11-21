@@ -2,7 +2,7 @@
 
 const assert = require('assert');
 
-const { subtle } = require('../../../');
+const { crypto: { subtle } } = require('../../../');
 
 describe('ECDH', () => {
   it('should generate/import/export keys and derive bits/keys', async () => {

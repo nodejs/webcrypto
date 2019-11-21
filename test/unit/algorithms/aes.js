@@ -3,7 +3,7 @@
 const assert = require('assert');
 const { randomBytes } = require('crypto');
 
-const { subtle } = require('../../../lib');
+const { crypto: { subtle } } = require('../../../');
 
 function twice(buf) {
   return Buffer.concat([buf, buf], buf.length * 2);

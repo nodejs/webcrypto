@@ -2,18 +2,30 @@
 
 const assert = require('assert');
 
-const crypto = require('../../lib');
+const defExport = require('../../');
 
 describe('Default export', () => {
-  it('should have getRandomBytes', () => {
-    assert.strictEqual(typeof crypto.getRandomValues, 'function');
+  describe('crypto property', () => {
+    it('should exist', () => {
+      assert.strictEqual(typeof defExport.crypto, 'object');
+    });
+
+    it('should have getRandomBytes', () => {
+      assert.strictEqual(typeof defExport.crypto.getRandomValues, 'function');
+    });
+
+    it('should have subtle', () => {
+      assert.strictEqual(typeof defExport.crypto.subtle, 'object');
+    });
+
+    it('should not have any other properties', () => {
+      assert.strictEqual(Object.keys(defExport.crypto).length, 2);
+    });
   });
 
-  it('should have subtle', () => {
-    assert.strictEqual(typeof crypto.subtle, 'object');
-  });
-
-  it('should not have any other properties', () => {
-    assert.strictEqual(Object.keys(crypto).length, 2);
+  describe('CryptoKey class', () => {
+    it('should exist', () => {
+      assert.strictEqual(typeof defExport.CryptoKey, 'function');
+    });
   });
 });
