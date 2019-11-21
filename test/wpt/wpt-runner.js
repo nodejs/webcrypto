@@ -98,7 +98,7 @@ async function runTest(test) {
       }
 
       assert.throws(fn, (err) => {
-        assert.strictEqual(err.name, errorName);
+        return err.name === errorName;
       }, name);
     },
     assert_true(value, name) {
