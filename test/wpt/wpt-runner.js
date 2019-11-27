@@ -181,7 +181,7 @@ async function runTest(test) {
       console.log(`not ok - ${name}`);
       console.log('  ---');
       console.log('  stack: |-');
-      console.log(err.stack.replace(/(^|\n)/g, '    $1'));
+      console.log(err.stack.replace(/(^|\n)/g, '$1    '));
       console.log('  ...');
       nFailed++;
     }
