@@ -29,10 +29,12 @@ describe('ECDSA', () => {
 
     const impPublicKey = await subtle.importKey('spki', expPublicKey, {
       name: 'ECDSA',
+      namedCurve: 'P-256',
       hash: 'SHA-384'
     }, true, ['verify']);
     const impPrivateKey = await subtle.importKey('pkcs8', expPrivateKey, {
       name: 'ECDSA',
+      namedCurve: 'P-256',
       hash: 'SHA-384'
     }, true, ['sign']);
 

@@ -168,7 +168,10 @@ describe('RSA-PSS', () => {
                           'f97b2303a0c6f23ebc6a497c5b6de813d26699bda4bdc65abf' +
                           '657c08b840a6';
     const signature = Buffer.from(signatureData, 'hex');
-    const ok = await subtle.verify('RSA-PSS', publicKey, signature, data);
+    const ok = await subtle.verify({
+      name: 'RSA-PSS',
+      saltLength: 20
+    }, publicKey, signature, data);
     assert.strictEqual(ok, true);
   });
 });
