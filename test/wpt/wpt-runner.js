@@ -9,6 +9,9 @@ const { crypto, CryptoKey } = require('../../');
 
 const tests = require('./wpt-tests');
 
+const summary = console.log;
+const info = process.argv[2] === '--summary-only' ? () => {} : console.log;
+
 function bug(message, ...info) {
   console.error(`Bail out! Fatal error: ${message}`);
   if (info.length !== 0)
@@ -22,7 +25,7 @@ let nPassedTotal = 0;
 let nFailedTotal = 0;
 
 async function runTest(test) {
-  console.log(`# Test: ${test.name}`);
+  info(`# Test: ${test.name}`);
 
   // State management.
   const pendingTests = [];
@@ -175,14 +178,14 @@ async function runTest(test) {
 
     try {
       type === 'sync' ? fn() : await fn();
-      console.log(`ok - ${name}`);
+      info(`ok - ${name}`);
       nPassed++;
     } catch (err) {
-      console.log(`not ok - ${name}`);
-      console.log('  ---');
-      console.log('  stack: |-');
-      console.log(err.stack.replace(/(^|\n)/g, '$1    '));
-      console.log('  ...');
+      info(`not ok - ${name}`);
+      info('  ---');
+      info('  stack: |-');
+      info(err.stack.replace(/(^|\n)/g, '$1    '));
+      info('  ...');
       nFailed++;
     }
   }
@@ -191,8 +194,7 @@ async function runTest(test) {
     bug('Test added after test loop ended.');
   };
 
-  console.log(`# Result for ${test.name}: ${nPassed} passed, ` +
-              `${nFailed} failed`);
+  summary(`# Result for ${test.name}: ${nPassed} passed, ${nFailed} failed`);
   nPassedTotal += nPassed;
   nFailedTotal += nFailed;
 }
@@ -202,7 +204,7 @@ async function runTest(test) {
     await runTest(test);
   }
 
-  console.log(`# Total: ${nPassedTotal} passed, ${nFailedTotal} failed`);
+  summary(`# Total: ${nPassedTotal} passed, ${nFailedTotal} failed`);
 })()
 .catch((err) => {
   console.error(err);
