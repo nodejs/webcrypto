@@ -43,6 +43,9 @@ function testGenImportExport(name, keyUsages) {
     assert.deepStrictEqual(await subtle.exportKey('raw', impKey1), expKey1);
     assert.deepStrictEqual(await subtle.exportKey('raw', impKey2), expKey2);
     assert.deepStrictEqual(await subtle.exportKey('raw', impKey3), expKey3);
+
+    await assert.rejects(subtle.importKey('xyz', expKey1, name, true, keyUsages), /NotSupportedError/);
+    await assert.rejects(subtle.exportKey('xyz', impKey1), /NotSupportedError/);
   };
 }
 
@@ -156,6 +159,39 @@ describe('AES-CTR', () => {
     decrypted = await subtle.decrypt({ name: 'AES-CTR', counter, length }, key,
                                      ciphertext);
     assert.deepStrictEqual(decrypted, plaintext);
+
+    // Invalid lengths should throw.
+    for (const length of [0, 129]) {
+      await assert.rejects(subtle.encrypt({ name: 'AES-CTR', counter, length },
+                                          key, plaintext),
+                           /OperationError/);
+      await assert.rejects(subtle.decrypt({ name: 'AES-CTR', counter, length },
+                                          key, ciphertext),
+                           /OperationError/);
+    }
+  });
+
+  it('should throw if the counter length is incorrect', async () => {
+    const keyData = Buffer.from('36adfe538cc234279e4cbb29e1f27af5', 'hex');
+    const iv = Buffer.from('2159e5bd415791990e52b5c825572994', 'hex').slice(1);
+    const plaintext = Buffer.from('Hello WebCrypto!', 'utf8');
+    const ciphertext = Buffer.from('8bb6173879b0f7a8899397e0fde3a3c88c69e86b1' +
+                                   '8eb74f8629be60287c89552', 'hex');
+
+    const key = await subtle.importKey('raw', keyData, 'AES-CTR', false,
+                                       ['encrypt', 'decrypt']);
+
+    await assert.rejects(subtle.encrypt({
+      name: 'AES-CTR',
+      counter: iv,
+      length: 128
+    }, key, plaintext), /OperationError/);
+
+    await assert.rejects(subtle.decrypt({
+      name: 'AES-CTR',
+      counter: iv,
+      length: 128
+    }, key, ciphertext), /OperationError/);
   });
 });
 
@@ -187,6 +223,46 @@ describe('AES-CBC', () => {
       iv
     }, key, ciphertext);
     assert.deepStrictEqual(deciphered, plaintext);
+  });
+
+  it('should throw if the padding is incorrect', async () => {
+    const keyData = Buffer.from('36adfe538cc234279e4cbb29e1f27af5', 'hex');
+    const iv = Buffer.from('2159e5bd415791990e52b5c825572994', 'hex');
+    const ciphertext = Buffer.from('8bb6173879b0f7a8899397e0fde3a3c88c69e86b1' +
+                                   '8eb74f8629be60287c89552', 'hex');
+
+    // There is a chance that a random modification will not lead to a padding
+    // error, which is why this test always uses the same modification.
+    ciphertext[ciphertext.length - 1] ^= 1;
+
+    const key = await subtle.importKey('raw', keyData, 'AES-CBC', false,
+                                       ['encrypt', 'decrypt']);
+
+    await assert.rejects(subtle.decrypt({
+      name: 'AES-CBC',
+      iv
+    }, key, ciphertext), /OperationError/);
+  });
+
+  it('should throw if the IV length is incorrect', async () => {
+    const keyData = Buffer.from('36adfe538cc234279e4cbb29e1f27af5', 'hex');
+    const iv = Buffer.from('2159e5bd415791990e52b5c825572994', 'hex').slice(1);
+    const plaintext = Buffer.from('Hello WebCrypto!', 'utf8');
+    const ciphertext = Buffer.from('8bb6173879b0f7a8899397e0fde3a3c88c69e86b1' +
+                                   '8eb74f8629be60287c89552', 'hex');
+
+    const key = await subtle.importKey('raw', keyData, 'AES-CBC', false,
+                                       ['encrypt', 'decrypt']);
+
+    await assert.rejects(subtle.encrypt({
+      name: 'AES-CBC',
+      iv
+    }, key, plaintext), /OperationError/);
+
+    await assert.rejects(subtle.decrypt({
+      name: 'AES-CBC',
+      iv
+    }, key, ciphertext), /OperationError/);
   });
 });
 
@@ -220,6 +296,61 @@ describe('AES-GCM', () => {
     assert.deepStrictEqual(deciphered, plaintext);
   });
 
+  it('should support additional data', async () => {
+    const keyData = Buffer.from('36adfe538cc234279e4cbb29e1f27af5', 'hex');
+    const iv = Buffer.from('2159e5bd415791990e52b5c825572994', 'hex');
+
+    const key = await subtle.importKey('raw', keyData, 'AES-GCM', false,
+                                       ['encrypt', 'decrypt']);
+
+    const additionalData = Buffer.from('top secret', 'utf8');
+
+    const plaintext = Buffer.from('Hello WebCrypto!', 'utf8');
+    const ciphertext = await subtle.encrypt({
+      name: 'AES-GCM',
+      iv,
+      additionalData
+    }, key, plaintext);
+    assert.strictEqual(ciphertext.toString('hex'),
+                       '7080337fe4a1f8d8d96fa061ccfdb8cdaf9258a59f4ed2dc33da6' +
+                       'f11b76c5bf6');
+
+    const incorrectAAD = randomBytes(additionalData.length);
+    for (const additionalData of [undefined, incorrectAAD]) {
+      await assert.rejects(subtle.decrypt({
+        name: 'AES-GCM',
+        iv,
+        additionalData
+      }, key, ciphertext), /OperationError/);
+    }
+
+    const deciphered = await subtle.decrypt({
+      name: 'AES-GCM',
+      iv,
+      additionalData
+    }, key, ciphertext);
+    assert.deepStrictEqual(deciphered, plaintext);
+  });
+
+  it('should throw if the ciphertext has been modified', async () => {
+    const keyData = Buffer.from('36adfe538cc234279e4cbb29e1f27af5', 'hex');
+    const iv = Buffer.from('2159e5bd415791990e52b5c825572994', 'hex');
+    const ciphertext = Buffer.from('7080337fe4a1f8d8d96fa061ccfdb8cda6dacbf3f' +
+                                   '27ef1dc85190feddc4befdd', 'hex');
+
+    // Flip exactly one bit.
+    const rand = (n) => Math.floor(Math.random() * n);
+    ciphertext[rand(ciphertext.length)] ^= (1 << rand(8));
+
+    const key = await subtle.importKey('raw', keyData, 'AES-GCM', false,
+                                       ['encrypt', 'decrypt']);
+
+    await assert.rejects(subtle.decrypt({
+      name: 'AES-GCM',
+      iv
+    }, key, ciphertext), /OperationError/);
+  });
+
   it('should handle the "tagLength" parameter', async () => {
     const keyData = Buffer.from('36adfe538cc234279e4cbb29e1f27af5', 'hex');
     const iv = Buffer.from('2159e5bd415791990e52b5c825572994', 'hex');
@@ -243,6 +374,18 @@ describe('AES-GCM', () => {
       tagLength: 112
     }, key, ciphertext);
     assert.deepStrictEqual(deciphered, plaintext);
+
+    await assert.rejects(subtle.encrypt({
+      name: 'AES-GCM',
+      iv,
+      tagLength: 111
+    }, key, plaintext), /OperationError/);
+
+    await assert.rejects(subtle.decrypt({
+      name: 'AES-GCM',
+      iv,
+      tagLength: 111
+    }, key, ciphertext), /OperationError/);
   });
 
   it('should support all IV lengths', async () => {
@@ -297,5 +440,12 @@ describe('AES-KW', () => {
                                                 ['encrypt', 'decrypt']);
     assert.deepStrictEqual(await subtle.exportKey('raw', unwrappedKey),
                            await subtle.exportKey('raw', keyToWrap));
+  });
+
+  it('should not allow encrypt/decrypt', async () => {
+    await assert.rejects(subtle.generateKey({
+      name: 'AES-KW',
+      length: 192
+    }, false, ['encrypt', 'decrypt']), /SyntaxError/);
   });
 });
