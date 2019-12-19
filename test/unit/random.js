@@ -25,4 +25,23 @@ describe('crypto.getRandomBytes', () => {
     const buf2 = getRandomValues(Buffer.alloc(1024));
     assert(!buf1.equals(buf2));
   });
+
+  it('should throw if the input is invalid', () => {
+    for (const notAnArrayBufferView of [undefined, null, 5, 'foo']) {
+      assert.throws(() => {
+        getRandomValues(notAnArrayBufferView);
+      }, /TypeError/);
+    }
+
+    const buf = new ArrayBuffer(65544);
+    for (const View of [Float32Array, Float64Array]) {
+      assert.throws(() => {
+        getRandomValues(new View(buf));
+      }, /TypeMismatchError/);
+    }
+
+    assert.throws(() => {
+      getRandomValues(new Uint32Array(buf));
+    }, /QuotaExceededError/);
+  });
 });
