@@ -20,4 +20,9 @@ describe('crypto.subtle', () => {
   it('should not have any other properties', () => {
     assert.strictEqual(Object.keys(subtle).length, fns.length);
   });
+
+  it('should throw if an unsupported algorithm is requested', async () => {
+    return assert.rejects(subtle.digest('AES-KW', Buffer.alloc(0)),
+                          /NotSupportedError/);
+  });
 });
