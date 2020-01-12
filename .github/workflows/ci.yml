@@ -31,21 +31,10 @@ jobs:
           - macOS-latest
     steps:
       - uses: actions/checkout@master
+      - run: git submodule update --init --recursive
       - uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
       - run: npm install
       - run: npm run coverage
-
-  test-nightly:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@master
-      - name: npm run coverage
-        run: |
-          curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
-          export NVM_DIR=~/.nvm
-          source ~/.nvm/nvm.sh
-          NVM_NODEJS_ORG_MIRROR=https://nodejs.org/download/nightly/ nvm install node
-          npm install
-          npm run coverage
+      - run: npm run wpt -- --summary-only
