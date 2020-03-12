@@ -269,4 +269,58 @@ describe('RSA-OAEP', () => {
     }, privateKey, Buffer.from(ciphertext, 'hex'));
     assert.deepStrictEqual(decrypted, plaintext);
   });
+
+  it('should support JWK keys', async () => {
+    const pubJwk = {
+      alg: 'RSA-OAEP-256',
+      e: 'AQAB',
+      ext: true,
+      key_ops: ['encrypt'],
+      kty: 'RSA',
+      n: '45Es9JLwnFY6hrSSgQ8Jg9R8keRW1vGYE6HUnuIxCuAwNBvPLNAZk6Xjo8LLlTNhGxu' +
+         'prMcdmCTnDb1bBDg1xGCu3npaSeuXiRXUCtJ7rSzRRtLPMUDFamDgpMksUp6TzkUMjV' +
+         'DJRzqjgtJMoJ6wV-pJBE-8XQSGRkVJJ9i0t9E'
+    };
+
+    const pubKey = await subtle.importKey('jwk', pubJwk,
+                                          { name: 'RSA-OAEP', hash: 'SHA-256' },
+                                          true, ['encrypt']);
+    const exportedPubJwk = await subtle.exportKey('jwk', pubKey);
+    assert.deepStrictEqual(exportedPubJwk, pubJwk);
+
+    const privJwk = {
+      alg: 'RSA-OAEP-256',
+      d: 'D8q8YSjiRXhuvXgsni6mNSMK1aVQHmtBElmzCNHptSzAw5j2G_tr-Z-eiA0loLq3n3s' +
+         '1tN2o0NenaMAYymvr1SLuljLUbQnxYKxc6kmsR8DjPAlzTs_OgQ4cI3gdObuveptjPH' +
+         '9DpjuLyFqS_Vv-bzaGq0ywizEot1iKTHJxhk0',
+      dp: 'nAllsl_oYf3K8kV7DafF48VFndJ4wKi8AYLQFhrZK1ueDGX328odKIBCE42q1U5TZg' +
+          'tvzyF_ryL3ar85RBJRvQ',
+      dq: 'pPYfF37ZjuK7KcZ7ST7Yg4-SwPwBmrpoF5ZoTiiwqqD9EiEfsfw0D9IKON_Jpfm3-H' +
+          'd5HOC2LDLGE5QrKepB-Q',
+      e: 'AQAB',
+      ext: true,
+      key_ops: ['decrypt'],
+      kty: 'RSA',
+      n: '45Es9JLwnFY6hrSSgQ8Jg9R8keRW1vGYE6HUnuIxCuAwNBvPLNAZk6Xjo8LLlTNhGxu' +
+         'prMcdmCTnDb1bBDg1xGCu3npaSeuXiRXUCtJ7rSzRRtLPMUDFamDgpMksUp6TzkUMjV' +
+         'DJRzqjgtJMoJ6wV-pJBE-8XQSGRkVJJ9i0t9E',
+      p: '-1Z0sFXW4BHMq7jiYOA3cREt7oWEvEoMNTjrrTEA2cgMYfP1dz0Bm7pgh5opQYzmVmf' +
+         '3j06cO5a214PyweCKBQ',
+      q: '58nWsMm5LzbzyP27yTafEsK0cmA9mObjeyrSU6yFzwdXlR2jNy6Wbp48rRmaDZu5AuJ' +
+         'LFhAyenH6ZH918JiEXQ',
+      qi: 'dtd9nD_Ss8o7iZBrwP_4A4fsae_E5En9w_jrw8arp8u_MVO6PbRrGHRcpCkKliBSwU' +
+          'CoUtm1LevNhdtmEIJ5jQ'
+    };
+
+    const privKey = await subtle.importKey('jwk',
+                                           privJwk,
+                                           {
+                                             name: 'RSA-OAEP',
+                                             hash: 'SHA-256'
+                                           },
+                                           true,
+                                           ['decrypt']);
+    const exportedPrivJwk = await subtle.exportKey('jwk', privKey);
+    assert.deepStrictEqual(exportedPrivJwk, privJwk);
+  });
 });
