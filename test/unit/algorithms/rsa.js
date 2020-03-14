@@ -23,7 +23,7 @@ function testGenImportExport(name, pubKeyUsage, privKeyUsage) {
       assert.strictEqual(key.algorithm.name, name);
       assert.strictEqual(key.algorithm.modulusLength, 2048);
       assert.deepStrictEqual(key.algorithm.publicExponent,
-                             Buffer.from([0x01, 0x00, 0x01]));
+                             new Uint8Array([0x01, 0x00, 0x01]));
       assert.strictEqual(key.algorithm.hash.name, 'SHA-384');
     }
 
@@ -40,6 +40,14 @@ function testGenImportExport(name, pubKeyUsage, privKeyUsage) {
       name,
       hash: 'SHA-384'
     }, true, [privKeyUsage]);
+
+    for (const key of [impPublicKey, impPrivateKey]) {
+      assert.strictEqual(key.algorithm.name, name);
+      assert.strictEqual(key.algorithm.modulusLength, 2048);
+      assert.deepStrictEqual(key.algorithm.publicExponent,
+                             new Uint8Array([0x01, 0x00, 0x01]));
+      assert.strictEqual(key.algorithm.hash.name, 'SHA-384');
+    }
 
     assert.deepStrictEqual(await subtle.exportKey('spki', impPublicKey),
                            expPublicKey);
