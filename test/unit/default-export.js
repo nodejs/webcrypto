@@ -28,4 +28,10 @@ describe('Default export', () => {
       assert.strictEqual(typeof defExport.CryptoKey, 'function');
     });
   });
+
+  describe('unsafeExportKey function', () => {
+    it('should exist', () => {
+      assert.strictEqual(typeof defExport.unsafeExportKey, 'function');
+    });
+  });
 });
