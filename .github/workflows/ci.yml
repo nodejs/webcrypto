@@ -49,7 +49,7 @@ jobs:
         with:
           node-version: 12.x
       - name: Install and Test
-        run: npm cit
+        run: npm install
       - name: Publish to GitHub Package (unstable)
         run: ./scripts/publish-to-github.sh
         env:
