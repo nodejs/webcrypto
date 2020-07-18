@@ -1,26 +1,26 @@
 {
-  "main": "./lib/index.js",
-  "name": "webcrypto",
+  "name": "@dimensiondev/webcrypto",
   "version": "0.1.0",
+  "private": true,
+  "bugs": "https://github.com/nodejs/webcrypto/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nodejs/webcrypto.git"
+  },
+  "license": "MIT",
+  "author": "Tobias Nießen <tniessen@tnie.de>",
+  "main": "./lib/index.js",
+  "scripts": {
+    "coverage": "nyc --reporter=html --reporter=text mocha --recursive ./test/unit/",
+    "lint": "eslint lib test/unit test/wpt/wpt-runner.js",
+    "test": "mocha --recursive ./test/unit/",
+    "wpt": "node test/wpt/wpt-runner"
+  },
   "devDependencies": {
     "babel-eslint": "^10.0.2",
     "eslint": "^6.1.0",
     "mocha": "^6.2.0",
     "nyc": "^14.1.1"
-  },
-  "scripts": {
-    "test": "mocha --recursive ./test/unit/",
-    "coverage": "nyc --reporter=html --reporter=text mocha --recursive ./test/unit/",
-    "lint": "eslint lib test/unit test/wpt/wpt-runner.js",
-    "wpt": "node test/wpt/wpt-runner"
-  },
-  "license": "MIT",
-  "private": true,
-  "author": "Tobias Nießen <tniessen@tnie.de>",
-  "bugs": "https://github.com/nodejs/webcrypto/issues",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/nodejs/webcrypto.git"
   },
   "engines": {
     "node": ">= 12.11"

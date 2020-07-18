@@ -29,6 +29,7 @@ jobs:
           - ubuntu-latest
           - windows-latest
           - macOS-latest
+
     steps:
       - uses: actions/checkout@master
       - run: git submodule update --init --recursive
@@ -38,3 +39,18 @@ jobs:
       - run: npm install
       - run: npm run coverage
       - run: npm run wpt -- --summary-only
+
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js 12.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+      - name: Install and Test
+        run: npm cit
+      - name: Publish to GitHub Package (unstable)
+        run: ./scripts/publish-to-github.sh
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
