@@ -1,8 +1,0 @@
-language: node_js
-node_js:
-  - "12"
-
-script:
-  - npm run lint
-  - npm run coverage
-  - npm run wpt -- --summary-only
